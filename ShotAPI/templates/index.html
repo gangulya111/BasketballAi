@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Virtual Basketball Instructor</title>
+</head>
+<body>
+  <h2>Upload Video</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" id="videoFile" name="video" accept="video/*">
+    <button type="submit">Start Analysis</button>
+  </form>
+
+  <hr>
+  <h3>Processed Video:</h3>
+  <img id="videoStream" width="640" height="480">
+
+  <script>
+    const form = document.getElementById("uploadForm");
+    const videoStream = document.getElementById("videoStream");
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+
+      const file = document.getElementById("videoFile").files[0];
+      if (!file) return alert("Please select a video file first!");
+
+      const formData = new FormData();
+      formData.append("video", file);
+
+      // Send the video to the backend
+      const response = await fetch("/upload", {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // Start the video stream
+        videoStream.src = `/video_feed?path=${encodeURIComponent(data.path)}`;
+      } else {
+        alert("Upload failed!");
+      }
+    };
+  </script>
+</body>
+</html>
+
